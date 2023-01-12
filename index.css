@@ -19,6 +19,7 @@ body {
     max-width: 750px;
     height: 100%;
     margin: auto;
+    --header-height: clamp(75px, 25vh, 300px);
 }
 
 header, main {
@@ -30,7 +31,7 @@ header, main {
 header {
     position: relative;
     display: flex;
-    height: clamp(75px, 30vh, 250px);
+    height: var(--header-height);
     background: no-repeat;
     background: black;
     opacity: 0.9;
@@ -66,22 +67,18 @@ a {
 #search-bar {
     position: absolute;
     bottom: -19px;
-    
     width: calc(100% - var(--sides-padding)*2);
     height: 38px;
     margin: auto;
-
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 10px;
     padding: 0px;
-
     background: #FFFFFF;
     border: 1px solid #D1D5DB;
     border-radius: 6px;
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
-
 }
 
 #search-icon {
@@ -126,13 +123,15 @@ a {
 }
 
 main {
-    height: 100%;
+    min-height: calc(100 - var(--header-height));
     background: #FFF;
+    padding-top: 45px;
 }
 
 .clear {
+    height: calc(100% - var(--header-height));
     width: 100%;
-    padding-top: 40%;
+    padding-top: 35%;
     text-align: center;
     color: #DFDDDD;
     font-weight: 700;
@@ -144,7 +143,95 @@ main {
     font-size: 3.75rem;
 }
 
+.movie-container,
+.movie-titleline,
+.movie-watchlistline {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.movie-container {
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+    gap: clamp(1rem, 3vw, 2rem);
+    font-weight: 400;
+}
+
+.movie-container p {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.movie-container i {
+    display: flex;
+    align-self: center;
+    margin-left: 1.25rem;
+    margin-right: 4px;
+}
+
 .movie-poster {
-    width: 100px;
-    height: 100px;
+    margin: 0;
+    padding: 0;
+    height: clamp(140px, 25vw, 300px);
+    aspect-ratio: 0.68;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.movie-details {
+    align-self: center;
+}
+
+.movie-titleline {
+    color: #000;
+}
+
+.movie-title {
+    margin: 0;
+    font-weight: 500;
+    font-size: 1.125rem;
+    line-height: 1.25rem;
+}
+
+.fa-star {
+    font-size: 0.825rem;
+    color: #FEC654;
+}
+
+.movie-rating {
+    font-size: 0.75rem;
+    line-height: 1;
+    align-self: center;
+}
+
+.movie-watchlistline {
+    margin: clamp(0.75rem, 2.1vw, 1.125rem) 0 clamp(0.5rem, 1.5vw, 1rem) 0;
+    font-size: 0.75rem;
+    line-height: 1.125rem;
+    color: #111827;
+}
+
+.movie-runtime {
+    margin-right: 1rem;
+}
+
+.watchlist-area {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.watchlist-icon {
+    font-size: 1rem;
+}
+
+.watchlist-text {
+    align-self: center;
+}
+
+.movie-plot {
+    font-size: 0.875rem;
+    color: #6B7280;
 }
