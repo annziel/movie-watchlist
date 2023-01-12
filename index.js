@@ -4,8 +4,12 @@ const watchlist = []
 
 
 document.addEventListener("click", e => {
-    e.target.id === "search-btn" ? searchMovies() :
-    e.target.classList.contains("watchlist-area") ? updateWatchlist(e.target.id) : null
+    if (e.target.id === "search-btn") {
+        searchMovies()
+    }
+    else if (e.target.closest(".watchlist-area")) {
+        updateWatchlist(e.target.closest(".watchlist-area").dataset.title)
+    }
 })
 
 
@@ -16,10 +20,19 @@ searchInput.addEventListener("keydown", (e) => {
     }
 })
 
+function handleSearchEvent() {
+    
+}
+
 async function searchMovies() {
     const res = await fetch(`http://www.omdbapi.com/?s=${searchInput.value}&apikey=34e8bc5c`)
     const data = await res.json()
-    data.Response === "True" ? getMoviesDetails(data.Search) : showErrorMessage()
+    if (data.Response === "True") {
+        getMoviesDetails(data.Search)
+    }
+    else {
+        showErrorMessage()
+    }
     searchInput.value = ""
 }
 
@@ -64,7 +77,7 @@ function createMovieHtml(movie) {
 function watchlistHtml(boolean, title) {
     if (boolean) {
         return `
-            <div class="watchlist-area" id=${title}>
+            <div class="watchlist-area" data-title="${title}">
                 <i class="fa-solid fa-circle-minus" class="watchlist-icon"></i>
                 <p class="watchlist-text">Remove</p>
             </div>
@@ -72,7 +85,7 @@ function watchlistHtml(boolean, title) {
     }
     else {
         return `
-            <div class="watchlist-area" id=${title}>
+            <div class="watchlist-area" data-title="${title}">
                 <i class="fa-solid fa-circle-plus" class="watchlist-icon"></i>
                 <p class="watchlist-text">Watchlist</p>
             </div>
@@ -92,11 +105,23 @@ function showErrorMessage() {
     main.innerHTML = `<p>Unable to find what you’re looking for.<br>Please try another search.</p>`
 }
 
-function updateWatchlist(movieId) {
-    console.log("updateWatchlist started")
-    const arrayToSearch = [
-        { Title: movieId}
-    ]
-    getMoviesDetails(arrayToSearch)
-    console.log("updateWatchlist ended")
+function updateWatchlist(movieTitle) {
+    if (watchlist.length === 0) {
+        watchlist.push({Title: movieTitle})
+    }
+    else {
+        let indexToRemove
+        for (let i = 0; i < watchlist.length; i++) {
+            if (watchlist[i].Title.includes(movieTitle)) {
+                indexToRemove = i
+            }
+        }
+        if(indexToRemove) {
+            watchlist.splice(indexToRemove, 1)
+            indexToRemove = 0
+        }
+        else {
+            watchlist.push({Title: movieTitle})
+        }
+    }
 }
