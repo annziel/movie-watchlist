@@ -1,6 +1,6 @@
 const searchInput = document.getElementById("search-input")
 const main = document.querySelector("main")
-let searchResults = []
+let ObjectsToRender = []
 let watchlist
 
 if(localStorage.myWatchlist){
@@ -28,7 +28,7 @@ document.addEventListener("keydown", (e) => {
 // because API when search doesn't return every information needed, it is necessary to make fetch twice,
 // the second one for gaining the information about each movie independently
 async function searchMovies() {
-    searchResults = []
+    ObjectsToRender = []
     try {
         const res = await fetch(`http://www.omdbapi.com/?s=${searchInput.value}&apikey=34e8bc5c`)
         const data = await res.json()
@@ -55,7 +55,7 @@ async function getMoviesDetails(array) {
         try {
             const res = await fetch(`http://www.omdbapi.com/?i=${array[id]}&apikey=34e8bc5c`)
             const movieData = await res.json()
-            searchResults.push(movieData)
+            ObjectsToRender.push(movieData)
             createMovieHtml(movieData)
         }
         catch(err) {
@@ -139,8 +139,36 @@ function toggleMovieInWatchlist(movieId) {
 
     localStorage.setItem("myWatchlist", JSON.stringify(watchlist))
 
-    searchResults.forEach(movie => createMovieHtml(movie))
-    renderMoviesList()
+    if (document.body.id === "watchlist-page") {
+        const objectToRemove = ObjectsToRender.indexOf(
+            ObjectsToRender.find(
+                object => object.imdbID === movieId
+            )
+        ) 
+        ObjectsToRender.splice(objectToRemove, 1)
+        if (watchlist.length === 0) {
+            emptyWatchlistMessage()
+        }
+    }
+
+    if (document.body.id === "watchlist-page" && watchlist.length === 0) {
+            emptyWatchlistMessage()
+        }
+    else {
+        ObjectsToRender.forEach(movie => createMovieHtml(movie))
+        renderMoviesList()
+    }
+}
+
+function emptyWatchlistMessage() {
+    main.classList.add("clear")
+    main.innerHTML = `
+        <p>Your Watchlist is looking a little empty...</p>
+        <a href="index.html" id="link-to-searchpage">
+            <i class="fa-solid fa-circle-plus"></i>
+            <p>Let's add some movies!</p>
+        </a>
+    `
 }
 
 if(document.body.id === "watchlist-page") {
@@ -149,20 +177,8 @@ if(document.body.id === "watchlist-page") {
         main.innerHTML = pageContent
     }
     else {
-        main.classList.add("clear")
-        main.innerHTML = `
-            <p>Your watchlist is looking a little empty...</p>
-            <a href="index.html" id="link-to-searchpage">
-                <i class="fa-solid fa-circle-plus"></i>
-                <p>Let's add some movies!</p>
-            </a>
-        `
+        emptyWatchlistMessage()
     }
 }
 
-
-
-// const arrayToSearch = [
-//     { Title: movieTitle}
-// ]
-// getMoviesDetails(arrayToSearch)
+localStorage.clear()
