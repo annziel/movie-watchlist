@@ -1,7 +1,11 @@
 const searchInput = document.getElementById("search-input")
 const main = document.querySelector("main")
-const watchlist = []
 let searchResults = []
+let watchlist
+
+if(localStorage.myWatchlist){
+    watchlist = JSON.parse(localStorage.getItem("myWatchlist"))
+} else watchlist = []
 
 /// EVENTLISTENERS
 document.addEventListener("click", e => {
@@ -132,13 +136,14 @@ function toggleMovieInWatchlist(movieId) {
     else {
         watchlist.unshift(movieId)
     }
-    console.log(watchlist)
+
+    localStorage.setItem("myWatchlist", JSON.stringify(watchlist))
+
     searchResults.forEach(movie => createMovieHtml(movie))
     renderMoviesList()
 }
 
 if(document.body.id === "watchlist-page") {
-    console.log(watchlist)
     if (watchlist.length > 0) {
         const pageContent = getMoviesDetails(watchlist)
         main.innerHTML = pageContent
