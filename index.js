@@ -8,7 +8,7 @@ document.addEventListener("click", e => {
         searchMovies()
     }
     else if (e.target.closest(".watchlist-area")) {
-        updateWatchlist(e.target.closest(".watchlist-area").dataset.title)
+        toggleMovieInWatchlist(e.target.closest(".watchlist-area").id)
     }
 })
 
@@ -28,7 +28,8 @@ async function searchMovies() {
     const res = await fetch(`http://www.omdbapi.com/?s=${searchInput.value}&apikey=34e8bc5c`)
     const data = await res.json()
     if (data.Response === "True") {
-        getMoviesDetails(data.Search)
+        const idArray = data.Search.map(movie => movie.imdbID)
+        getMoviesDetails(idArray)
     }
     else {
         showErrorMessage()
@@ -37,8 +38,8 @@ async function searchMovies() {
 }
 
 async function getMoviesDetails(array) {
-    for (let i = 0; i < array.length; i++) {
-        const res = await fetch(`http://www.omdbapi.com/?t=${array[i].Title}&apikey=34e8bc5c`)
+    for (let id = 0; id < array.length; id++) {
+        const res = await fetch(`http://www.omdbapi.com/?i=${array[id]}&apikey=34e8bc5c`)
         const movieData = await res.json()
         createMovieHtml(movieData)
     }
@@ -64,7 +65,7 @@ function createMovieHtml(movie) {
                 <div class="movie-watchlistline">
                     <p class="movie-runtime">${movie.Runtime}</p>
                     <p class="movie-genre">${movie.Genre}</p>
-                    ${watchlistHtml(isOnWatchlist, movie.Title)}
+                    ${watchlistHtml(isOnWatchlist, movie.imdbID)}
                 </div>
                 <p class="movie-plot">${movie.Plot}</p>
             </div>
@@ -74,10 +75,10 @@ function createMovieHtml(movie) {
     moviesHtml += oneMovieHtml
 }
 
-function watchlistHtml(boolean, title) {
+function watchlistHtml(boolean, id) {
     if (boolean) {
         return `
-            <div class="watchlist-area" data-title="${title}">
+            <div class="watchlist-area" id="${id}">
                 <i class="fa-solid fa-circle-minus" class="watchlist-icon"></i>
                 <p class="watchlist-text">Remove</p>
             </div>
@@ -85,7 +86,7 @@ function watchlistHtml(boolean, title) {
     }
     else {
         return `
-            <div class="watchlist-area" data-title="${title}">
+            <div class="watchlist-area" id="${id}">
                 <i class="fa-solid fa-circle-plus" class="watchlist-icon"></i>
                 <p class="watchlist-text">Watchlist</p>
             </div>
@@ -102,26 +103,29 @@ function renderMoviesList() {
 
 function showErrorMessage() {
     main.classList.add("clear")
-    main.innerHTML = `<p>Unable to find what you’re looking for.<br>Please try another search.</p>`
+    main.innerHTML = `<p>Unable to find what you're looking for.<br>Please try another search.</p>`
 }
 
-function updateWatchlist(movieTitle) {
-    if (watchlist.length === 0) {
-        watchlist.push({Title: movieTitle})
-    }
-    else {
-        let indexToRemove
-        for (let i = 0; i < watchlist.length; i++) {
-            if (watchlist[i].Title.includes(movieTitle)) {
-                indexToRemove = i
-            }
-        }
-        if(indexToRemove) {
-            watchlist.splice(indexToRemove, 1)
-            indexToRemove = 0
-        }
-        else {
-            watchlist.push({Title: movieTitle})
+function toggleMovieInWatchlist(movieId) {    
+    let indexToRemove
+    for (let i = 0; i < watchlist.length; i++) {
+        if (watchlist[i].includes(movieId)) {
+            indexToRemove = i
         }
     }
+    if(indexToRemove !== undefined) {
+        watchlist.splice(indexToRemove, 1)
+        return
+    }
+    watchlist.push(movieId)
 }
+
+// if(document.body.id === "strona1") {
+
+// } else {
+
+// }
+// const arrayToSearch = [
+//     { Title: movieTitle}
+// ]
+// getMoviesDetails(arrayToSearch)

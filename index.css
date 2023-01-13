@@ -59,6 +59,11 @@ header {
     font-size: clamp(12px, 1.75vw, 1rem);
 }
 
+#nav:hover {
+    text-decoration: underline;
+    font-weight: 700;
+}
+
 a {
     color: #FFF;
     text-decoration: none;
