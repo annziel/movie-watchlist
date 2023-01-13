@@ -77,6 +77,7 @@ function showErrorMessage() {
 
 // PREPARING AND RENDERING DATA
 let moviesHtml = ""
+// triggered by getMoviesDetails for each movie
 function createMovieHtml(movie) {
     moviesHtml += `
         <div class="movie-container">
@@ -119,7 +120,7 @@ function watchlistHtml(id) {
         `
     }
 }
-
+// triggered by getMoviesDetails when html for movieList is ready to render
 function renderMoviesList() {
     main.classList.remove("clear")
     main.innerHTML = moviesHtml
@@ -128,7 +129,9 @@ function renderMoviesList() {
 
 
 // WATCHLIST MAINTAINING
-function toggleMovieInWatchlist(movieId) {    
+// triggered by clicking on .watchlist-area
+function toggleMovieInWatchlist(movieId) {
+    // targeting the id to remove from watchlist and removing it (if necessary)
     const indexToRemove = watchlist.indexOf(movieId);
     if(indexToRemove !== -1) {
         watchlist.splice(indexToRemove, 1)
@@ -137,8 +140,10 @@ function toggleMovieInWatchlist(movieId) {
         watchlist.unshift(movieId)
     }
 
+// localStorage updating
     localStorage.setItem("myWatchlist", JSON.stringify(watchlist))
 
+// rendering the updated watchlist, if user is on watchlist.html, or updated search results
     if (document.body.id === "watchlist-page") {
         const objectToRemove = ObjectsToRender.indexOf(
             ObjectsToRender.find(
@@ -146,9 +151,6 @@ function toggleMovieInWatchlist(movieId) {
             )
         ) 
         ObjectsToRender.splice(objectToRemove, 1)
-        if (watchlist.length === 0) {
-            emptyWatchlistMessage()
-        }
     }
 
     if (document.body.id === "watchlist-page" && watchlist.length === 0) {
@@ -171,6 +173,7 @@ function emptyWatchlistMessage() {
     `
 }
 
+// rendering the watchlist when user goes to watchlist.html (a new data request to API)
 if(document.body.id === "watchlist-page") {
     if (watchlist.length > 0) {
         const pageContent = getMoviesDetails(watchlist)
@@ -180,5 +183,8 @@ if(document.body.id === "watchlist-page") {
         emptyWatchlistMessage()
     }
 }
+
+
+
 
 localStorage.clear()
