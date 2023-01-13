@@ -228,6 +228,10 @@ main {
     align-items: center;
 }
 
+.to-remove {
+    color: #6B7280;
+}
+
 .watchlist-icon {
     font-size: 1rem;
 }

@@ -1,6 +1,7 @@
 const searchInput = document.getElementById("search-input")
 const main = document.querySelector("main")
 const watchlist = []
+let searchResults = []
 
 /// EVENTLISTENERS
 document.addEventListener("click", e => {
@@ -24,6 +25,7 @@ searchInput.addEventListener("keydown", (e) => {
 // because API when search doesn't return every information needed, it is necessary to make fetch twice,
 // the second one for gaining the information about each movie independently
 async function searchMovies() {
+    searchResults = []
     try {
         const res = await fetch(`http://www.omdbapi.com/?s=${searchInput.value}&apikey=34e8bc5c`)
         const data = await res.json()
@@ -50,6 +52,7 @@ async function getMoviesDetails(array) {
         try {
             const res = await fetch(`http://www.omdbapi.com/?i=${array[id]}&apikey=34e8bc5c`)
             const movieData = await res.json()
+            searchResults.push(movieData)
             createMovieHtml(movieData)
         }
         catch(err) {
@@ -94,7 +97,7 @@ function watchlistHtml(id) {
     if (watchlist.includes(id)) {
         isOnWatchlist = true
         return `
-            <div class="watchlist-area" id="${id}">
+            <div class="watchlist-area to-remove" id="${id}">
                 <i class="fa-solid fa-circle-minus" class="watchlist-icon"></i>
                 <p class="watchlist-text">Remove</p>
             </div>
@@ -122,9 +125,12 @@ function toggleMovieInWatchlist(movieId) {
     const indexToRemove = watchlist.indexOf(movieId);
     if(indexToRemove !== -1) {
         watchlist.splice(indexToRemove, 1)
-        return
     }
-    watchlist.push(movieId)
+    else {
+        watchlist.unshift(movieId)
+    }
+    searchResults.forEach(movie => createMovieHtml(movie))
+    renderMoviesList()
 }
 
 // if(document.body.id === "strona1") {
