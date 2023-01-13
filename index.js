@@ -2,7 +2,7 @@ const searchInput = document.getElementById("search-input")
 const main = document.querySelector("main")
 const watchlist = []
 
-
+/// EVENTLISTENERS
 document.addEventListener("click", e => {
     if (e.target.id === "search-btn") {
         searchMovies()
@@ -20,40 +20,55 @@ searchInput.addEventListener("keydown", (e) => {
     }
 })
 
-function handleSearchEvent() {
-    
-}
-
+// SEARCHING FOR DATA
+// because API when search doesn't return every information needed, it is necessary to make fetch twice,
+// the second one for gaining the information about each movie independently
 async function searchMovies() {
-    const res = await fetch(`http://www.omdbapi.com/?s=${searchInput.value}&apikey=34e8bc5c`)
-    const data = await res.json()
-    if (data.Response === "True") {
-        const idArray = data.Search.map(movie => movie.imdbID)
-        getMoviesDetails(idArray)
+    try {
+        const res = await fetch(`http://www.omdbapi.com/?s=${searchInput.value}&apikey=34e8bc5c`)
+        const data = await res.json()
+        // a second fetch takes place only if search (the first request) was valid (the boolean "Response" key in response is true)
+        if (data.Response === "True") {
+            // it takes the array of movies (the "Search" key) and map it to the array of unique ids only,
+            // as only that information is needed to access further details
+            const idArray = data.Search.map(movie => movie.imdbID) 
+            getMoviesDetails(idArray)
+        }
+        else {
+            showErrorMessage()
+        }
     }
-    else {
+    catch(err) {
         showErrorMessage()
     }
+    
     searchInput.value = ""
 }
 
 async function getMoviesDetails(array) {
     for (let id = 0; id < array.length; id++) {
-        const res = await fetch(`http://www.omdbapi.com/?i=${array[id]}&apikey=34e8bc5c`)
-        const movieData = await res.json()
-        createMovieHtml(movieData)
+        try {
+            const res = await fetch(`http://www.omdbapi.com/?i=${array[id]}&apikey=34e8bc5c`)
+            const movieData = await res.json()
+            createMovieHtml(movieData)
+        }
+        catch(err) {
+            showErrorMessage()
+        }
     }
     renderMoviesList()
 }
 
+function showErrorMessage() {
+    main.classList.add("clear")
+    main.innerHTML = `<p>Unable to find what you're looking for.<br>Please try another search.<br>If the problem repeats, please try again later.</p>`
+}
+
+
+// PREPARING AND RENDERING DATA
 let moviesHtml = ""
 function createMovieHtml(movie) {
-    let isOnWatchlist = false
-    if (watchlist.includes(movie)) {
-        isOnWatchlist = true
-    }
-
-    const oneMovieHtml = `
+    moviesHtml += `
         <div class="movie-container">
             <div class="movie-poster" style="background-image:url(${movie.Poster}")></div>
             <div class="movie-details">
@@ -65,18 +80,19 @@ function createMovieHtml(movie) {
                 <div class="movie-watchlistline">
                     <p class="movie-runtime">${movie.Runtime}</p>
                     <p class="movie-genre">${movie.Genre}</p>
-                    ${watchlistHtml(isOnWatchlist, movie.imdbID)}
+                    ${watchlistHtml(movie.imdbID)}
                 </div>
                 <p class="movie-plot">${movie.Plot}</p>
             </div>
         </div>
         <hr>
     `
-    moviesHtml += oneMovieHtml
 }
 
-function watchlistHtml(boolean, id) {
-    if (boolean) {
+function watchlistHtml(id) {
+    let isOnWatchlist = false
+    if (watchlist.includes(id)) {
+        isOnWatchlist = true
         return `
             <div class="watchlist-area" id="${id}">
                 <i class="fa-solid fa-circle-minus" class="watchlist-icon"></i>
@@ -101,19 +117,10 @@ function renderMoviesList() {
 }
 
 
-function showErrorMessage() {
-    main.classList.add("clear")
-    main.innerHTML = `<p>Unable to find what you're looking for.<br>Please try another search.</p>`
-}
-
+// WATCHLIST MAINTAINING
 function toggleMovieInWatchlist(movieId) {    
-    let indexToRemove
-    for (let i = 0; i < watchlist.length; i++) {
-        if (watchlist[i].includes(movieId)) {
-            indexToRemove = i
-        }
-    }
-    if(indexToRemove !== undefined) {
+    const indexToRemove = watchlist.indexOf(movieId);
+    if(indexToRemove !== -1) {
         watchlist.splice(indexToRemove, 1)
         return
     }
