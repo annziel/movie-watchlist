@@ -13,9 +13,8 @@ document.addEventListener("click", e => {
     }
 })
 
-
-searchInput.addEventListener("keydown", (e) => {
-    if (e.code === "Enter" && !e.shiftKey) {
+document.addEventListener("keydown", (e) => {
+    if (e.code === "Enter" && !e.shiftKey && e.target.id === "search-input") {
         e.preventDefault()
         searchMovies()
     }
@@ -64,7 +63,11 @@ async function getMoviesDetails(array) {
 
 function showErrorMessage() {
     main.classList.add("clear")
-    main.innerHTML = `<p>Unable to find what you're looking for.<br>Please try another search.<br>If the problem repeats, please try again later.</p>`
+    main.innerHTML = `
+        <p>Unable to find what you're looking for.<br>
+        Please try another search.<br>
+        If the problem repeats, please try again later.</p>
+    `
 }
 
 
@@ -129,15 +132,31 @@ function toggleMovieInWatchlist(movieId) {
     else {
         watchlist.unshift(movieId)
     }
+    console.log(watchlist)
     searchResults.forEach(movie => createMovieHtml(movie))
     renderMoviesList()
 }
 
-// if(document.body.id === "strona1") {
+if(document.body.id === "watchlist-page") {
+    console.log(watchlist)
+    if (watchlist.length > 0) {
+        const pageContent = getMoviesDetails(watchlist)
+        main.innerHTML = pageContent
+    }
+    else {
+        main.classList.add("clear")
+        main.innerHTML = `
+            <p>Your watchlist is looking a little empty...</p>
+            <a href="index.html" id="link-to-searchpage">
+                <i class="fa-solid fa-circle-plus"></i>
+                <p>Let's add some movies!</p>
+            </a>
+        `
+    }
+}
 
-// } else {
 
-// }
+
 // const arrayToSearch = [
 //     { Title: movieTitle}
 // ]
