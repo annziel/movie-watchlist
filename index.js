@@ -52,12 +52,12 @@ async function searchMovies() {
 }
 
 async function getMoviesDetails(array) {
-    for (let id = 0; id < array.length; id++) {
+    for (let i = 0; i < array.length; i++) {
         try {
-            const res = await fetch(`http://www.omdbapi.com/?i=${array[id]}&apikey=34e8bc5c`)
+            const res = await fetch(`http://www.omdbapi.com/?i=${array[i]}&apikey=34e8bc5c`)
             const movieData = await res.json()
             ObjectsToRender.push(movieData)
-            createMovieHtml(movieData)
+            createMovieHtml(movieData, array.length, i)
         }
         catch(err) {
             showErrorMessage()
@@ -79,7 +79,7 @@ function showErrorMessage() {
 // PREPARING AND RENDERING DATA
 let moviesHtml = ""
 // triggered by getMoviesDetails for each movie
-function createMovieHtml(movie) {
+function createMovieHtml(movie, maxItem, currentItem) {
     moviesHtml += `
         <div class="movie-container">
             <div class="movie-poster" style="background-image:url(${movie.Poster}")></div>
@@ -97,8 +97,10 @@ function createMovieHtml(movie) {
                 <p class="movie-plot">${movie.Plot}</p>
             </div>
         </div>
-        <hr>
     `
+    if(currentItem !== maxItem - 1){
+        moviesHtml += `<hr>`
+    }
 }
 
 function isOnWatchlistHtml(id) {
@@ -189,6 +191,7 @@ if(document.body.id === "watchlist-page") {
 
 function renderLoader() {
     main.classList.add("clear")
+    //  code from https://loading.io/css/
     return `
     <div class="lds-default">
     <div></div><div></div><div></div><div></div><div></div><div></div>

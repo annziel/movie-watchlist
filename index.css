@@ -258,6 +258,7 @@ main {
 
 
 /* THE LOADER */
+/* code from https://loading.io/css/ */
 .lds-default {
     display: inline-block;
     position: relative;
