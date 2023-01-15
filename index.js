@@ -98,7 +98,7 @@ function createMovieHtml(movie, maxItem, currentItem) {
             </div>
         </div>
     `
-    if(currentItem !== maxItem - 1){
+    if (currentItem !== maxItem - 1) {
         moviesHtml += `<hr>`
     }
 }

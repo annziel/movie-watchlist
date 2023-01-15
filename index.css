@@ -3,7 +3,7 @@
 }
 
 body {
-    margin: 0;
+    margin: 0 0 10px 0;
     width: 100%;
     font-family: 'Inter';
     font-style: normal;
@@ -17,7 +17,6 @@ body {
     justify-content: flex-start;
     align-items: center;
     max-width: 750px;
-    height: 100%;
     margin: auto;
     --header-height: clamp(75px, 25vh, 300px);
 }
@@ -37,6 +36,7 @@ header {
     opacity: 0.9;
     background-image: url("background.png");
     background-size: cover;
+    background-position: center;
 }
 
 #header-text {
@@ -49,8 +49,9 @@ header {
 }
 
 #title {
+    margin: 0;
     font-weight: 800;
-    font-size: clamp(22px, 7vw, 2.5rem);
+    font-size: clamp(22px, 6.5vw, 2.5rem);
     letter-spacing: 0.75px;
 }
 
@@ -131,12 +132,13 @@ main {
     min-height: calc(100 - var(--header-height));
     background: #FFF;
     padding-top: 45px;
+    padding-bottom: var(--sides-padding);
 }
 
 .clear {
-    height: calc(100% - var(--header-height));
+    height: calc(100vh - var(--header-height));
     width: 100%;
-    padding-top: 35%;
+    padding-top: 30vh;
     text-align: center;
     color: #DFDDDD;
     font-weight: 700;
@@ -179,7 +181,7 @@ main {
 .movie-poster {
     margin: 0;
     padding: 0;
-    height: clamp(140px, 25vw, 300px);
+    height: clamp(140px, 16vh, 300px);
     aspect-ratio: 0.68;
     background-repeat: no-repeat;
     background-size: contain;
