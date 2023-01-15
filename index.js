@@ -28,6 +28,7 @@ document.addEventListener("keydown", (e) => {
 // because API when search doesn't return every information needed, it is necessary to make fetch twice,
 // the second one for gaining the information about each movie independently
 async function searchMovies() {
+    main.innerHTML = renderLoader()
     ObjectsToRender = []
     try {
         const res = await fetch(`http://www.omdbapi.com/?s=${searchInput.value}&apikey=34e8bc5c`)
@@ -91,7 +92,7 @@ function createMovieHtml(movie) {
                 <div class="movie-watchlistline">
                     <p class="movie-runtime">${movie.Runtime}</p>
                     <p class="movie-genre">${movie.Genre}</p>
-                    ${watchlistHtml(movie.imdbID)}
+                    ${isOnWatchlistHtml(movie.imdbID)}
                 </div>
                 <p class="movie-plot">${movie.Plot}</p>
             </div>
@@ -100,7 +101,7 @@ function createMovieHtml(movie) {
     `
 }
 
-function watchlistHtml(id) {
+function isOnWatchlistHtml(id) {
     let isOnWatchlist = false
     if (watchlist.includes(id)) {
         isOnWatchlist = true
@@ -176,6 +177,7 @@ function emptyWatchlistMessage() {
 // rendering the watchlist when user goes to watchlist.html (a new data request to API)
 if(document.body.id === "watchlist-page") {
     if (watchlist.length > 0) {
+        main.innerHTML = renderLoader()
         const pageContent = getMoviesDetails(watchlist)
         main.innerHTML = pageContent
     }
@@ -185,6 +187,15 @@ if(document.body.id === "watchlist-page") {
 }
 
 
+function renderLoader() {
+    main.classList.add("clear")
+    return `
+    <div class="lds-default">
+    <div></div><div></div><div></div><div></div><div></div><div></div>
+    <div></div><div></div><div></div><div></div><div></div><div></div>
+    </div>
+    `
+}
 
 
 localStorage.clear()
