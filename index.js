@@ -56,8 +56,8 @@ async function searchMovies() {
     }
 }
 
-async function getMoviesDetails(array) {
-    return await Promise.all(array.map(async movieId => {
+function getMoviesDetails(array) {
+    return Promise.all(array.map(async movieId => {
         const res = await fetch(`http://www.omdbapi.com/?i=${movieId}&apikey=34e8bc5c`)
         return await res.json()
     }))
@@ -66,35 +66,33 @@ async function getMoviesDetails(array) {
 // PREPARING AND RENDERING DATA
 // triggered when data from an API are gained
 function createMoviesHtml(moviesArray) {
-    for (let movie = 0; movie < moviesArray.length; movie++) {
+    for (const movie of moviesArray) {
         moviesHtml += `
             <div class="movie-container">
-                <div class="movie-poster" style="background-image:url(${moviesArray[movie].Poster}")></div>
+                <div class="movie-poster" style="background-image:url(${movie.Poster}")></div>
                 <div class="movie-details">
                     <div class="movie-titleline">
-                        <p class="movie-title">${moviesArray[movie].Title}</p>
+                        <p class="movie-title">${movie.Title}</p>
                         <i class="fa-solid fa-star"></i>
-                        <p class="movie-rating">${moviesArray[movie].imdbRating}</p>
+                        <p class="movie-rating">${movie.imdbRating}</p>
                     </div>
                     <div class="movie-watchlistline">
-                        <p class="movie-runtime">${moviesArray[movie].Runtime}</p>
-                        <p class="movie-genre">${moviesArray[movie].Genre}</p>
-                        ${isOnWatchlistHtml(moviesArray[movie].imdbID)}
+                        <p class="movie-runtime">${movie.Runtime}</p>
+                        <p class="movie-genre">${movie.Genre}</p>
+                        ${isOnWatchlistHtml(movie.imdbID)}
                     </div>
-                    <p class="movie-plot">${moviesArray[movie].Plot}</p>
+                    <p class="movie-plot">${movie.Plot}</p>
                 </div>
             </div>
         `
-        if (movie !== moviesArray.length - 1) {
+        if (movie !== moviesArray[moviesArray.length - 1]) {
             moviesHtml += `<hr>`
         }
     }
 }
 
 function isOnWatchlistHtml(id) {
-    let isOnWatchlist = false
     if (watchlist.includes(id)) {
-        isOnWatchlist = true
         return `
             <div class="watchlist-area to-remove" id="${id}">
                 <i class="fa-solid fa-circle-minus" class="watchlist-icon"></i>
