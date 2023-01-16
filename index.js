@@ -1,105 +1,93 @@
+// variables and localStorage access
 const searchInput = document.getElementById("search-input")
 const main = document.querySelector("main")
-let ObjectsToRender = []
-let watchlist
+let objectsToRender = []
+let moviesHtml = ""
 
-if(localStorage.myWatchlist){
+let watchlist
+if (localStorage.myWatchlist) {
     watchlist = JSON.parse(localStorage.getItem("myWatchlist"))
 } else watchlist = []
 
 /// EVENTLISTENERS
+document.addEventListener("submit", e => {
+    e.preventDefault()
+    handleSearchEvent()
+})
+
 document.addEventListener("click", e => {
-    if (e.target.id === "search-btn") {
-        searchMovies()
-    }
-    else if (e.target.closest(".watchlist-area")) {
-        toggleMovieInWatchlist(e.target.closest(".watchlist-area").id)
+    if (e.target.closest(".watchlist-area")) {
+        handleWatchlistChange(e.target.closest(".watchlist-area").id)
     }
 })
 
-document.addEventListener("keydown", (e) => {
-    if (e.code === "Enter" && !e.shiftKey && e.target.id === "search-input") {
-        e.preventDefault()
-        searchMovies()
-    }
-})
 
 // SEARCHING FOR DATA
-// because API when search doesn't return every information needed, it is necessary to make fetch twice,
+// because API doesn't return every information needed when searching, it is necessary to make fetch twice,
 // the second one for gaining the information about each movie independently
-async function searchMovies() {
+
+async function handleSearchEvent() {
     main.innerHTML = renderLoader()
-    ObjectsToRender = []
+    objectsToRender = []
     try {
-        const res = await fetch(`http://www.omdbapi.com/?s=${searchInput.value}&apikey=34e8bc5c`)
-        const data = await res.json()
-        // a second fetch takes place only if search (the first request) was valid (the boolean "Response" key in response is true)
-        if (data.Response === "True") {
-            // it takes the array of movies (the "Search" key) and map it to the array of unique ids only,
-            // as only that information is needed to access further details
-            const idArray = data.Search.map(movie => movie.imdbID) 
-            getMoviesDetails(idArray)
-        }
-        else {
-            showErrorMessage()
-        }
+        const idArray = await searchMovies()
+        searchInput.value = ""
+        objectsToRender = await getMoviesDetails(idArray)
+        createMoviesHtml(objectsToRender)
+        renderMoviesList()
     }
     catch(err) {
         showErrorMessage()
     }
-    
-    searchInput.value = ""
+}
+
+// requests to an API
+async function searchMovies() {
+    const res = await fetch(`http://www.omdbapi.com/?s=${searchInput.value}&apikey=34e8bc5c`)
+    const data = await res.json()
+    // a second fetch takes place only if search (the first request) was valid (the boolean "Response" key in res is true)
+    if (data.Response === "True") {
+        // it takes the array of movies (the "Search" key from data) and map it to the array of unique ids only,
+        // as only that information is needed to access further details
+        return data.Search.map(movie => movie.imdbID)
+    }
+    else {
+        throw new Error()
+    }
 }
 
 async function getMoviesDetails(array) {
-    for (let i = 0; i < array.length; i++) {
-        try {
-            const res = await fetch(`http://www.omdbapi.com/?i=${array[i]}&apikey=34e8bc5c`)
-            const movieData = await res.json()
-            ObjectsToRender.push(movieData)
-            createMovieHtml(movieData, array.length, i)
-        }
-        catch(err) {
-            showErrorMessage()
-        }
-    }
-    renderMoviesList()
+    return await Promise.all(array.map(async movieId => {
+        const res = await fetch(`http://www.omdbapi.com/?i=${movieId}&apikey=34e8bc5c`)
+        return await res.json()
+    }))
 }
-
-function showErrorMessage() {
-    main.classList.add("clear")
-    main.innerHTML = `
-        <p>Unable to find what you're looking for.<br>
-        Please try another search.<br>
-        If the problem repeats, please try again later.</p>
-    `
-}
-
 
 // PREPARING AND RENDERING DATA
-let moviesHtml = ""
-// triggered by getMoviesDetails for each movie
-function createMovieHtml(movie, maxItem, currentItem) {
-    moviesHtml += `
-        <div class="movie-container">
-            <div class="movie-poster" style="background-image:url(${movie.Poster}")></div>
-            <div class="movie-details">
-                <div class="movie-titleline">
-                    <p class="movie-title">${movie.Title}</p>
-                    <i class="fa-solid fa-star"></i>
-                    <p class="movie-rating">${movie.imdbRating}</p>
+// triggered when data from an API are gained
+function createMoviesHtml(moviesArray) {
+    for (let movie = 0; movie < moviesArray.length; movie++) {
+        moviesHtml += `
+            <div class="movie-container">
+                <div class="movie-poster" style="background-image:url(${moviesArray[movie].Poster}")></div>
+                <div class="movie-details">
+                    <div class="movie-titleline">
+                        <p class="movie-title">${moviesArray[movie].Title}</p>
+                        <i class="fa-solid fa-star"></i>
+                        <p class="movie-rating">${moviesArray[movie].imdbRating}</p>
+                    </div>
+                    <div class="movie-watchlistline">
+                        <p class="movie-runtime">${moviesArray[movie].Runtime}</p>
+                        <p class="movie-genre">${moviesArray[movie].Genre}</p>
+                        ${isOnWatchlistHtml(moviesArray[movie].imdbID)}
+                    </div>
+                    <p class="movie-plot">${moviesArray[movie].Plot}</p>
                 </div>
-                <div class="movie-watchlistline">
-                    <p class="movie-runtime">${movie.Runtime}</p>
-                    <p class="movie-genre">${movie.Genre}</p>
-                    ${isOnWatchlistHtml(movie.imdbID)}
-                </div>
-                <p class="movie-plot">${movie.Plot}</p>
             </div>
-        </div>
-    `
-    if (currentItem !== maxItem - 1) {
-        moviesHtml += `<hr>`
+        `
+        if (movie !== moviesArray.length - 1) {
+            moviesHtml += `<hr>`
+        }
     }
 }
 
@@ -123,16 +111,31 @@ function isOnWatchlistHtml(id) {
         `
     }
 }
-// triggered by getMoviesDetails when html for movieList is ready to render
+
+// triggered when the moviesHtml is ready to render
 function renderMoviesList() {
     main.classList.remove("clear")
     main.innerHTML = moviesHtml
     moviesHtml = ""
 }
 
+// triggered by errors in async functions
+function showErrorMessage() {
+    main.classList.add("clear")
+    main.innerHTML = `
+        <p>Unable to find what you're looking for.<br>
+        Please try another search.<br>
+        If the problem repeats, please try again later.</p>
+    `
+}
 
 // WATCHLIST MAINTAINING
-// triggered by clicking on .watchlist-area
+// watchlist updating, triggered by clicking on .watchlist-area
+function handleWatchlistChange(movieId) {
+    toggleMovieInWatchlist(movieId)
+    renderAfterWatchlistChange(movieId)
+}
+
 function toggleMovieInWatchlist(movieId) {
     // targeting the id to remove from watchlist and removing it (if necessary)
     const indexToRemove = watchlist.indexOf(movieId);
@@ -142,25 +145,23 @@ function toggleMovieInWatchlist(movieId) {
     else {
         watchlist.unshift(movieId)
     }
-
 // localStorage updating
     localStorage.setItem("myWatchlist", JSON.stringify(watchlist))
+}
 
-// rendering the updated watchlist, if user is on watchlist.html, or updated search results
+// rendering the updated watchlist, if user is on watchlist.html, or updating search results
+function renderAfterWatchlistChange(movieId) {
     if (document.body.id === "watchlist-page") {
-        const objectToRemove = ObjectsToRender.indexOf(
-            ObjectsToRender.find(
-                object => object.imdbID === movieId
-            )
+        const objectToRemove = objectsToRender.indexOf(
+            objectsToRender.find( object => object.imdbID === movieId )
         ) 
-        ObjectsToRender.splice(objectToRemove, 1)
+        objectsToRender.splice(objectToRemove, 1)
     }
-
     if (document.body.id === "watchlist-page" && watchlist.length === 0) {
             emptyWatchlistMessage()
         }
     else {
-        ObjectsToRender.forEach(movie => createMovieHtml(movie))
+        createMoviesHtml(objectsToRender)
         renderMoviesList()
     }
 }
@@ -179,14 +180,25 @@ function emptyWatchlistMessage() {
 // rendering the watchlist when user goes to watchlist.html (a new data request to API)
 if(document.body.id === "watchlist-page") {
     if (watchlist.length > 0) {
-        main.innerHTML = renderLoader()
-        const pageContent = getMoviesDetails(watchlist)
-        main.innerHTML = pageContent
+        handleWatchlistRequest()
     }
     else {
         emptyWatchlistMessage()
     }
 }
+
+async function handleWatchlistRequest() {
+    main.innerHTML = renderLoader()
+    try {
+        objectsToRender = await getMoviesDetails(watchlist)
+        createMoviesHtml(objectsToRender)
+        renderMoviesList()
+    }
+    catch(err) {
+        showErrorMessage()
+    }
+}
+
 
 
 function renderLoader() {
@@ -199,6 +211,3 @@ function renderLoader() {
     </div>
     `
 }
-
-
-localStorage.clear()

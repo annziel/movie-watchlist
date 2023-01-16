@@ -160,7 +160,7 @@ main {
 
 .movie-container {
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     padding: 20px 0;
     gap: clamp(1rem, 3vw, 2rem);
     font-weight: 400;
@@ -185,6 +185,7 @@ main {
     aspect-ratio: 0.68;
     background-repeat: no-repeat;
     background-size: contain;
+    background-position: center;
 }
 
 .movie-details {
