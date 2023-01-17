@@ -1,4 +1,4 @@
-# Use this App and kepp track on movies and TV series to watch!
+# Use this App and keep track on movies and TV series to watch!
 
 ## About the project
 
@@ -7,7 +7,7 @@ As a user, you can search for movies and tv series to watch and save your favori
 On the developer side, the main focus of this App is working with the [OMDb (The Open Movie Database)](https://www.omdbapi.com/) `API`. I built this App as a solo project during the Module 9 of [The Frontend Developer Career Path](https://scrimba.com/learn/frontend) on Scrimba.
 
 
-**[Check this App](#) and save your movies to watch! It's responsive so you can use your phone!** 😉
+**[Check this App](https://annziel.github.io/movie-watchlist/) and save your movies to watch! It's responsive so you can use your phone!** 😉
 
 
 ## What did I learn during the course?
