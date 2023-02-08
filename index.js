@@ -58,7 +58,7 @@ async function searchMovies() {
 
 function getMoviesDetails(array) {
     return Promise.all(array.map(async movieId => {
-        const res = await fetch(`http://www.omdbapi.com/?i=${movieId}&apikey=34e8bc5c`)
+        const res = await fetch(`https://www.omdbapi.com/?i=${movieId}&apikey=34e8bc5c`)
         return await res.json()
     }))
 }
