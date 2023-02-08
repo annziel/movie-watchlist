@@ -43,7 +43,7 @@ async function handleSearchEvent() {
 
 // requests to an API
 async function searchMovies() {
-    const res = await fetch(`http://www.omdbapi.com/?s=${searchInput.value}&apikey=34e8bc5c`)
+    const res = await fetch(`https://www.omdbapi.com/?s=${searchInput.value}&apikey=34e8bc5c`)
     const data = await res.json()
     // a second fetch takes place only if search (the first request) was valid (the boolean "Response" key in res is true)
     if (data.Response === "True") {
