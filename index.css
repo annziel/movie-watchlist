@@ -1,3 +1,24 @@
+@font-face {
+    font-family: 'Inter';
+    src: local('Inter'), url("../fonts/Inter-Light.ttf") format('truetype');
+    font-weight: 400;
+}
+@font-face {
+    font-family: 'Inter';
+    src: local('Inter'), url("../fonts/Inter-Regular.ttf") format('truetype');
+    font-weight: 500;
+}
+@font-face {
+    font-family: 'Inter';
+    src: local('Inter'), url("../fonts/Inter-Semibold.ttf") format('truetype');
+    font-weight: 700;
+}
+@font-face {
+    font-family: 'Inter';
+    src: local('Inter'), url("../fonts/Inter-Bold.ttf") format('truetype');
+    font-weight: 800;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -5,7 +26,7 @@
 body {
     margin: 0 0 10px 0;
     width: 100%;
-    font-family: 'Inter';
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     background: #ECE9E6;  /* fallback for old browsers */
     background: linear-gradient(to right, #FAFAFA, #DFDDDD);
