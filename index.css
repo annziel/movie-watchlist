@@ -1,21 +1,21 @@
 @font-face {
     font-family: 'Inter';
-    src: local('Inter'), url("../fonts/Inter-Light.ttf") format('truetype');
+    src: local('Inter'), url("./fonts/Inter-Light.ttf") format('truetype');
     font-weight: 400;
 }
 @font-face {
     font-family: 'Inter';
-    src: local('Inter'), url("../fonts/Inter-Regular.ttf") format('truetype');
+    src: local('Inter'), url("./fonts/Inter-Regular.ttf") format('truetype');
     font-weight: 500;
 }
 @font-face {
     font-family: 'Inter';
-    src: local('Inter'), url("../fonts/Inter-Semibold.ttf") format('truetype');
+    src: local('Inter'), url("./fonts/Inter-SemiBold.ttf") format('truetype');
     font-weight: 700;
 }
 @font-face {
     font-family: 'Inter';
-    src: local('Inter'), url("../fonts/Inter-Bold.ttf") format('truetype');
+    src: local('Inter'), url("./fonts/Inter-Bold.ttf") format('truetype');
     font-weight: 800;
 }
 
